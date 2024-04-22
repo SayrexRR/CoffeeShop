@@ -1,7 +1,13 @@
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+string connectionString = builder.Configuration.GetConnectionString("ShopConnection") ?? throw new InvalidOperationException("Connection string 'ShopConnection' not found.");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ShopContext>(options => options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 

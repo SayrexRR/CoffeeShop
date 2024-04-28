@@ -1,4 +1,4 @@
-namespace CoffeeShop.Models
+namespace DataAccess.Models
 {
     public class ErrorViewModel
     {

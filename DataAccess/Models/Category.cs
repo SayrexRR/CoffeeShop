@@ -14,6 +14,6 @@ namespace DataAccess.Models
         [DefaultValue(1)]
         public int DisplayOrder { get; set; }
 
-        public List<Product> Products { get; set; }
+        public List<Product>? Products { get; set; }
     }
 }

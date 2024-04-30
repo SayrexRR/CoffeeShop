@@ -1,9 +1,16 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.Web.Mvc;
 
-namespace DataAccess.Models
+namespace DataAccess.ViewModels
 {
-    public class Product
+    public class ProductViewModel
     {
         public Guid Id { get; set; }
 
@@ -24,7 +31,7 @@ namespace DataAccess.Models
 
         public Guid CategoryId { get; set; }
 
-        public Category Category { get; set; }
-        public List<OrderDetail> OrderDetails { get; set; }
+        [ValidateNever]
+        public IEnumerable<SelectListItem> CategoryList { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Repository;
+using Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,7 @@ string connectionString = builder.Configuration.GetConnectionString("ShopConnect
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ShopContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 

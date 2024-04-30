@@ -1,4 +1,4 @@
-namespace DataAccess.Models
+namespace DataAccess.ViewModels
 {
     public class ErrorViewModel
     {

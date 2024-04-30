@@ -1,21 +1,21 @@
-﻿using DataAccess;
-using DataAccess.Models;
+﻿using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Repository.IRepository;
 
 namespace CoffeeShop.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ShopContext _shopContext;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryController(ShopContext shopContext)
+        public CategoryController(ICategoryRepository categoryRepository)
         {
-            _shopContext = shopContext;
+            _categoryRepository = categoryRepository;
         }
 
         public IActionResult Index()
         {
-            List<Category> categories = _shopContext.Categories.ToList();
+            List<CategoryViewModel> categories = _categoryRepository.GetAll();
 
             return View(categories);
         }
@@ -27,12 +27,11 @@ namespace CoffeeShop.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Category category)
+        public IActionResult Create(CategoryViewModel category)
         {
             if (ModelState.IsValid)
             {
-                _shopContext.Categories.Add(category);
-                _shopContext.SaveChanges();
+                _categoryRepository.Add(category);
 
                 return RedirectToAction("Index");
             }
@@ -48,7 +47,7 @@ namespace CoffeeShop.Controllers
                 return BadRequest();
             }
 
-            var category = _shopContext.Categories.Find(categoryId);
+            var category = _categoryRepository.GetById(categoryId);
             if (category == null)
             {
                 return NotFound();
@@ -58,12 +57,11 @@ namespace CoffeeShop.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Category category)
+        public IActionResult Edit(CategoryViewModel category)
         {
             if (ModelState.IsValid)
             {
-                _shopContext.Categories.Update(category);
-                _shopContext.SaveChanges();
+                _categoryRepository.Update(category);
 
                 return RedirectToAction("Index");
             }
@@ -79,7 +77,7 @@ namespace CoffeeShop.Controllers
                 return BadRequest();
             }
 
-            var category = _shopContext.Categories.Find(categoryId);
+            var category = _categoryRepository.GetById(categoryId);
             if (category == null)
             {
                 return NotFound();
@@ -92,14 +90,7 @@ namespace CoffeeShop.Controllers
         [ActionName("Delete")]
         public IActionResult DeletePost(Guid? categoryId)
         {
-            var category = _shopContext.Categories.Find(categoryId);
-            if (category == null)
-            {
-                return BadRequest();
-            }
-
-            _shopContext.Categories.Remove(category);
-            _shopContext.SaveChanges();
+            _categoryRepository.Delete(categoryId);
 
             return RedirectToAction("Index");
         }

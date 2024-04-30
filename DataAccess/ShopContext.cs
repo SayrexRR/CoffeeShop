@@ -24,7 +24,8 @@ namespace DataAccess
 
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.Products)
-                .WithOne(p => p.Category);
+                .WithOne(p => p.Category)
+                .HasForeignKey(p => p.CategoryId);
 
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.OrderDetails)

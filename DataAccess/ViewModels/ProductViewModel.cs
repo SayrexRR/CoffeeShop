@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DataAccess.ViewModels
 {
@@ -27,9 +22,13 @@ namespace DataAccess.ViewModels
         [DefaultValue(1)]
         public int DisplayOrder { get; set; }
 
+        [ValidateNever]
         public string? ImageUrl { get; set; }
 
         public Guid CategoryId { get; set; }
+
+        [ValidateNever]
+        public CategoryViewModel? Category { get; set; }
 
         [ValidateNever]
         public IEnumerable<SelectListItem> CategoryList { get; set; }

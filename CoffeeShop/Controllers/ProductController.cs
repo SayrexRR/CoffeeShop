@@ -1,23 +1,26 @@
-﻿using DataAccess;
-using DataAccess.Models;
-using Microsoft.AspNetCore.Http;
+﻿using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Repository.IRepository;
 
 namespace CoffeeShop.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly ShopContext _shopContext;
+        private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(ShopContext shopContext)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IWebHostEnvironment webHostEnvironment)
         {
-            _shopContext = shopContext;
+            _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public ActionResult Index()
         {
-            List<Product> products = _shopContext.Products.Include(p => p.Category).ToList();
+            List<ProductViewModel> products = _productRepository.GetAll();
 
             return View(products);
         }
@@ -25,21 +28,43 @@ namespace CoffeeShop.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            ProductViewModel product = new ProductViewModel
+            {
+                CategoryList = _categoryRepository.GetAll().Select(c => new SelectListItem
+                {
+                    Text = c.CategoryName,
+                    Value = c.Id.ToString()
+                })
+            };
+
+            return View(product);
         }
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create(ProductViewModel product, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                _shopContext.Products.Add(product);
-                _shopContext.SaveChanges();
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\products");
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    product.ImageUrl = @"\images\products\" + fileName;
+                }
+
+                _productRepository.Add(product);
 
                 return RedirectToAction("Index");
             }
 
-            return View();
+            return View(product);
         }
 
         [HttpGet]
@@ -50,7 +75,13 @@ namespace CoffeeShop.Controllers
                 return BadRequest();
             }
 
-            var product = _shopContext.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == productId);
+            var product = _productRepository.GetById(productId);
+            product.CategoryList = _categoryRepository.GetAll().Select(c => new SelectListItem
+            {
+                Text = c.CategoryName,
+                Value = c.Id.ToString()
+            });
+
             if (product == null)
             {
                 return NotFound();
@@ -60,17 +91,39 @@ namespace CoffeeShop.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Product product)
+        public IActionResult Edit(ProductViewModel product, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                _shopContext.Products.Update(product);
-                _shopContext.SaveChanges();
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\products");
+
+                    if (!string.IsNullOrEmpty(product.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    product.ImageUrl = @"\images\products\" + fileName;
+                }
+
+                _productRepository.Update(product);
 
                 return RedirectToAction("Index");
             }
 
-            return View();
+            return View(product);
         }
 
         [HttpGet]
@@ -81,7 +134,7 @@ namespace CoffeeShop.Controllers
                 return BadRequest();
             }
 
-            var product = _shopContext.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == productId);
+            var product = _productRepository.GetById(productId);
             if (productId == null)
             {
                 return NotFound();
@@ -94,14 +147,12 @@ namespace CoffeeShop.Controllers
         [ActionName("Delete")]
         public IActionResult DeletePost(Guid? productId)
         {
-            var product = _shopContext.Products.Find(productId);
             if (productId == null)
             {
                 return NotFound();
             }
 
-            _shopContext.Products.Remove(product);
-            _shopContext.SaveChanges();
+            _productRepository.Delete(productId);
 
             return RedirectToAction("Index");
         }

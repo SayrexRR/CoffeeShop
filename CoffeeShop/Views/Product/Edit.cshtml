@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model ProductViewModel
 
 <h2>Edit Product</h2>
 <br />
@@ -6,6 +6,7 @@
     <div class="row">
         <div class="col-9">
             <input asp-for="Id" hidden />
+            <input asp-for="ImageUrl" hidden />
             <div class="col-12 row">
                 <div class="col-8 mb-3">
                     <label asp-for="ProductName" class="form-label"></label>
@@ -25,7 +26,7 @@
             <div class="col-12 row">
                 <div class="col-3 mb-3">
                     <label asp-for="CategoryId" class="form-label"></label>
-                    <select asp-for="CategoryId" class="form-select">
+                    <select asp-for="CategoryId" asp-items="@Model.CategoryList" class="form-select">
                         <option disabled selected>--Select Category--</option>
                     </select>
                     <span asp-validation-for="CategoryId" class="text-danger"></span>

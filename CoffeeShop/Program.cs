@@ -11,6 +11,7 @@ string connectionString = builder.Configuration.GetConnectionString("ShopConnect
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ShopContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 

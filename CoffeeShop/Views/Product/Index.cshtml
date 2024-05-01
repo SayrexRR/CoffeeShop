@@ -21,7 +21,7 @@
         </tr>
     </thead>
     <tbody class="table-light">
-        @foreach (var product in Model.OrderBy(p => p.DisplayOrder))
+        @foreach (var product in Model.OrderBy(p => p.Category.CategoryName).ThenBy(p => p.DisplayOrder))
         {
             <tr>
                 <td>@product.ProductName</td>

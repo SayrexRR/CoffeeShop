@@ -1,6 +1,6 @@
-using DataAccess.Models;
 using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Repository.IRepository;
 using System.Diagnostics;
 
 namespace CoffeeShop.Controllers
@@ -8,15 +8,19 @@ namespace CoffeeShop.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductRepository _productRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProductRepository productRepository)
         {
             _logger = logger;
+            _productRepository = productRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var products = _productRepository.GetAll();
+
+            return View(products);
         }
 
         public IActionResult Privacy()

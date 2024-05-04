@@ -1,4 +1,5 @@
 ﻿using DataAccess.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Repository.IRepository;
@@ -150,6 +151,14 @@ namespace CoffeeShop.Controllers
             if (productId == null)
             {
                 return NotFound();
+            }
+
+            var product = _productRepository.GetById(productId);
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, product.ImageUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
             }
 
             _productRepository.Delete(productId);

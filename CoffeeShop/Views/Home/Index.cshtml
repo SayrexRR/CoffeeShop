@@ -1,26 +1,60 @@
 ﻿@model List<ProductViewModel>
 
-<div class="row bg-white rounded-2 p-3">
-    @foreach (var product in Model)
-    {
-        <div class="col-lg-4 col-md-6">
-            <div class="row p-2">
-                <div class="card bg-white border-0">
-                    <img src="@product.ImageUrl" class="card-img-top rounded-2" style="height:300px; object-fit:cover;" />
-                    <div class="card-body text-black">
-                        <div>
-                            <h5 class="card-title text-center">@product.ProductName</h5>
-                        </div>
-                        <div>
-                            <p class="card-text">@product.Description</p>
-                        </div>
-                        <div class="text-center">
-                            <p>Price: <span>@product.Price $</span></p>
-                            <button type="button" class="btn btn-primary">Add to Cart</button>
+@{
+    List<CategoryViewModel> categories = ViewBag.Categories;
+    categories = categories.OrderBy(c => c.DisplayOrder).ToList();
+    string currentItem = "";
+    string currentCategory = ViewBag.CategoryName;
+}
+
+<div class="row bg-white mt-3">
+    <div class="col-2 bg-body-tertiary">
+        <div class="d-flex p-3 position-fixed" id="categoryFilter">
+            <ul class="nav nav-pills flex-column">
+                @for (int c = 0; c < categories.Count; c++)
+                {
+                    if (categories[c].CategoryName == currentCategory)
+                    {
+                        currentItem = "active text-white";
+                    }
+                    else
+                    {
+                        currentItem = "";
+                    }
+
+                    <li class="nav-item">
+                        <a class="nav-link py-3 border-bottom rounded-0 text-dark @currentItem"
+                           asp-action="Index" asp-controller="Home" asp-route-categoryName="@categories[c].CategoryName">@categories[c].CategoryName</a>
+                    </li>
+                }
+            </ul>
+        </div>
+        
+    </div>
+    <div class="col-10">
+        <div class="row rounded-2 p-3" id="productsPanel">
+            @foreach (var product in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="row p-2">
+                        <div class="card bg-white border-0">
+                            <img src="@product.ImageUrl" class="card-img-top rounded-2" style="object-fit:cover;" />
+                            <div class="card-body text-black">
+                                <div>
+                                    <h5 class="card-title text-center">@product.ProductName</h5>
+                                </div>
+                                <div>
+                                    <p class="card-text">@product.Description</p>
+                                </div>
+                                <div class="text-center">
+                                    <p>Price: <span>@product.Price $</span></p>
+                                    <button type="button" class="btn btn-primary">Add to Cart</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
-    }
+    </div>
 </div>
